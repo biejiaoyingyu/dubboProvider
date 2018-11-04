@@ -1,0 +1,70 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+  http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="dubboProvider" version="2" owner="cxf" />
+	<!-- 这里使用的注册中心是zookeeper,请换成自己的IP地址 -->
+	<dubbo:registry address="zookeeper://192.168.1.4:2181"	client="zkclient" />
+	<!-- 用dubbo协议在20880端口暴露服务 -->
+	<dubbo:protocol name="dubbo" port="20880" default="true">
+		<!--自定义参数-->
+		<dubbo:parameter key="queue" value="your_queue" />
+	</dubbo:protocol>
+
+	<dubbo:protocol name="rmi" port="20881" default="false"/>
+	<!-- 将该接口暴露到dubbo中 -->
+	<dubbo:service ref="bikeServiceImpl" group="one"	interface="com.cxf.dubbo.service.BikeService" >
+		<dubbo:method name="qryAllBike" loadbalance="roundrobin">
+		</dubbo:method>
+	</dubbo:service>
+
+	<dubbo:service ref="bikeServiceImpl2"  group="two"	interface="com.cxf.dubbo.service.BikeService">
+		<dubbo:method name="qryAllBike" loadbalance="roundrobin">
+		</dubbo:method>
+	</dubbo:service>
+
+	<dubbo:service ref="bookServiceImpl" group="one"	interface="com.cxf.dubbo.service.BookService" protocol="rmi,dubbo">
+		<dubbo:method name="getOneBook" loadbalance="roundrobin">
+		</dubbo:method>
+		<!--测试异步-->
+		<dubbo:method name="qryAllBook" loadbalance="roundrobin" async="true">
+		</dubbo:method>
+	</dubbo:service>
+
+	<!--测试不同分组和不同实现-->
+	<dubbo:service ref="bookServiceImpl2" group="two"	interface="com.cxf.dubbo.service.BookService" protocol="rmi,dubbo">
+		<dubbo:method name="getOneBook" loadbalance="random">
+		</dubbo:method>
+	</dubbo:service>
+
+	<dubbo:service ref="barServiceImpl"	interface="com.cxf.inteface.BarService" protocol="rmi,dubbo">
+	</dubbo:service>
+
+	<bean id="callbackService" class="com.cxf.dubbo.CallbackServiceImpl" />
+	<!--callbacks是callback实例的限制-->
+	<dubbo:service interface="com.cxf.dubbo.service.CallbackService" ref="callbackService" connections="1" callbacks="1000">
+		<dubbo:method name="addListener">
+			<!--用于描述方法参数的特征，index代表第几个参数-->
+			<dubbo:argument index="1" callback="true" />
+			<!--也可以通过指定类型的⽅式-->
+			<!--<dubbo:argument type="com.demo.CallbackListener" callback="true" />-->
+		</dubbo:method>
+	</dubbo:service>
+
+
+	<!-- 将具体的实现类加入到Spring容器中 -->
+	<bean id="bikeServiceImpl" class="com.cxf.dubbo.BikeServiceImpl" />
+	<bean id="bikeServiceImpl2" class="com.cxf.group.BikeServiceImpl" />
+
+	<bean id="bookServiceImpl" class="com.cxf.dubbo.BookServiceImpl" />
+	<bean id="bookServiceImpl2" class="com.cxf.group.BookServiceImpl" />
+
+	<bean id="barServiceImpl" class="com.cxf.dubbo.BarServiceImpl" />
+</beans>
+ 
