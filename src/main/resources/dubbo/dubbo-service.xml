@@ -10,7 +10,7 @@
 	<!-- 提供方应用信息，用于计算依赖关系 -->
 	<dubbo:application name="dubboProvider" version="2" owner="cxf" />
 	<!-- 这里使用的注册中心是zookeeper,请换成自己的IP地址 -->
-	<dubbo:registry address="zookeeper://192.168.1.4:2181"	client="zkclient" />
+	<dubbo:registry address="zookeeper://192.168.1.159:2181"	client="zkclient" />
 	<!-- 用dubbo协议在20880端口暴露服务 -->
 	<dubbo:protocol name="dubbo" port="20880" default="true">
 		<!--自定义参数-->
@@ -29,12 +29,12 @@
 		</dubbo:method>
 	</dubbo:service>
 
-	<dubbo:service ref="bookServiceImpl" group="one"	interface="com.cxf.dubbo.service.BookService" protocol="rmi,dubbo">
-		<dubbo:method name="getOneBook" loadbalance="roundrobin">
-		</dubbo:method>
+	<dubbo:service ref="bookServiceImpl" group="one"	interface="com.cxf.dubbo.service.BookService" protocol="dubbo">
+		<!--<dubbo:method name="getOneBook" loadbalance="roundrobin">-->
+		<!--</dubbo:method>-->
 		<!--测试异步-->
-		<dubbo:method name="qryAllBook" loadbalance="roundrobin" async="true">
-		</dubbo:method>
+		<!--<dubbo:method name="qryAllBook" loadbalance="roundrobin" async="true">-->
+		<!--</dubbo:method>-->
 	</dubbo:service>
 
 	<!--测试不同分组和不同实现-->
@@ -43,7 +43,7 @@
 		</dubbo:method>
 	</dubbo:service>
 
-	<dubbo:service ref="barServiceImpl"	interface="com.cxf.inteface.BarService" protocol="rmi,dubbo">
+	<dubbo:service ref="barServiceImpl"	interface="com.cxf.inteface.BarService" protocol="dubbo">
 	</dubbo:service>
 
 	<bean id="callbackService" class="com.cxf.dubbo.CallbackServiceImpl" />

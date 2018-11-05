@@ -16,4 +16,9 @@ public class BookServiceImpl implements BookService {
     public List<Book> qryAllBook() {
         return Arrays.asList(new Book("c++",1),new Book("python",2));
     }
+
+    @Override
+    public Book getOneBook4Callback(Integer id) {
+        return null;
+    }
 }

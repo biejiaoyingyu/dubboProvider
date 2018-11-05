@@ -10,6 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CallbackServiceImpl implements CallbackService {
     private final Map<String, CallBackListener> listeners = new ConcurrentHashMap<String, CallBackListener>();
+    /**
+     * 构造器
+     */
     public CallbackServiceImpl() {
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -17,6 +20,7 @@ public class CallbackServiceImpl implements CallbackService {
                     try {
                         for (Map.Entry<String, CallBackListener> entry : listeners.entrySet()) {
                             try {
+                                //反向调用客户端的逻辑
                                 entry.getValue().changed(getChanged(entry.getKey()));
                             } catch (Throwable t) {
                                 listeners.remove(entry.getKey());
@@ -36,6 +40,7 @@ public class CallbackServiceImpl implements CallbackService {
     @Override
     public void addListener(String key, CallBackListener listener) {
         listeners.put(key, listener);
+        //反向调用客户端的逻辑
         listener.changed(getChanged(key)); // 发送变更通知
     }
 
