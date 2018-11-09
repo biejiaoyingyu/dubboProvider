@@ -10,7 +10,7 @@
 	<!-- 提供方应用信息，用于计算依赖关系 -->
 	<dubbo:application name="dubboProvider" version="2" owner="cxf" />
 	<!-- 这里使用的注册中心是zookeeper,请换成自己的IP地址 -->
-	<dubbo:registry address="zookeeper://192.168.1.159:2181"	client="zkclient" />
+	<dubbo:registry address="zookeeper://192.168.1.179:2181"	client="zkclient" />
 	<!-- 用dubbo协议在20880端口暴露服务 -->
 	<dubbo:protocol name="dubbo" port="20880" default="true">
 		<!--自定义参数-->
@@ -19,8 +19,8 @@
 
 	<dubbo:protocol name="rmi" port="20881" default="false"/>
 	<!-- 将该接口暴露到dubbo中 -->
-	<dubbo:service ref="bikeServiceImpl" group="one"	interface="com.cxf.dubbo.service.BikeService" >
-		<dubbo:method name="qryAllBike" loadbalance="roundrobin">
+	<dubbo:service ref="bikeServiceImpl" group="one"	interface="com.cxf.dubbo.service.BikeService" token="123456">
+		<dubbo:method name="qryAllBike" loadbalance="roundrobin" >
 		</dubbo:method>
 	</dubbo:service>
 
@@ -56,6 +56,14 @@
 			<!--<dubbo:argument type="com.demo.CallbackListener" callback="true" />-->
 		</dubbo:method>
 	</dubbo:service>
+
+	<dubbo:service interface="com.cxf.dubbo.service.UserService" ref="userServiceImpl" protocol="dubbo" retries="0"/>
+	<bean id="userServiceImpl" class="com.cxf.dubbo.UserServiceImpl"/>
+
+
+	<dubbo:service interface="com.cxf.dubbo.service.PhoneService" ref="phoneServiceImpl"  protocol="dubbo" retries="0"/>
+
+	<bean id="phoneServiceImpl" class="com.cxf.dubbo.PhoneServiceImpl"/>
 
 
 	<!-- 将具体的实现类加入到Spring容器中 -->

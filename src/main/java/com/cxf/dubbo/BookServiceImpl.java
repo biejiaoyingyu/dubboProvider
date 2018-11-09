@@ -15,10 +15,6 @@ public class BookServiceImpl implements BookService {
         return new Book("三国演义",1);
     }
 
-
-
-
-
     @Override
     public List<Book> qryAllBook()
     {
